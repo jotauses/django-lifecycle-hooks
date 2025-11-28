@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-lifecycle-hooks"
-version = "1.0.0"
+version = "1.0.1"
 description = "A next-generation, high-performance declarative lifecycle hooks library for Django 5.x+"
 readme = "README.md"
 requires-python = ">=3.10"
