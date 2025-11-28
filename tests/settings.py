@@ -6,5 +6,6 @@ DATABASES = {
 }
 INSTALLED_APPS = [
     "tests",
+    "django_lifecycle_hooks",
 ]
 SECRET_KEY = "test-key"

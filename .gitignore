@@ -16,3 +16,17 @@ htmlcov/
 
 .vscode/
 .idea/
+
+# Documentation
+site/
+
+# Django
+db.sqlite3
+*.log
+
+# Type Checking / Linting
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store

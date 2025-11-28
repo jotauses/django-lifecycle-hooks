@@ -38,4 +38,4 @@ dependencies = [
 "Bug Tracker" = "https://github.com/yourusername/django-lifecycle-next/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/django_lifecycle_next"]
+packages = ["src/django_lifecycle_hooks"]

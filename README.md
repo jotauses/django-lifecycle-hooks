@@ -55,6 +55,41 @@ class UserAccount(LifecycleModelMixin, models.Model):
     def notify_external_system(self):
         # Safe to launch async tasks or external API calls here
         print(f"Syncing status {self.status} to CRM...")
+
+    # 4. Stacked Hooks: Run same method on multiple triggers
+    @hook(HookType.BEFORE_CREATE)
+    @hook(HookType.BEFORE_UPDATE, when="status", has_changed=True)
+    def update_timestamp(self):
+        self.last_modified = timezone.now()
+
+    # 5. Advanced Conditions: Use logical operators (&, |, ~)
+    @hook(HookType.BEFORE_UPDATE, condition=WhenFieldHasChanged("status") & WhenFieldValueIs("category", "VIP"))
+    def notify_vip_manager(self):
+        send_email("VIP Status Changed", ...)
+
+    # 6. Watching Related Fields: Dot notation support
+    @hook(HookType.BEFORE_SAVE, when="profile.language", has_changed=True)
+    def update_search_index(self):
+        self.reindex()
+
+## Advanced Usage
+
+### Utility Methods
+You can check field changes imperatively within your methods:
+
+```python
+if self.has_changed("status"):
+    print(f"Status changed from {self.initial_value('status')} to {self.current_value('status')}")
+```
+
+### Suppression
+Temporarily disable hooks for bulk operations or specific blocks:
+
+```python
+with instance.suppress_hooked_methods():
+    instance.status = "maintenance"
+    instance.save()  # No hooks will fire
+```
 ```
 
 ## ⚡ Performance Architecture
@@ -71,6 +106,9 @@ We take performance seriously. Here is how we differ from the rest:
 ## ✨ Key Features
 
 - **Granular Triggers:** `BEFORE_SAVE`, `AFTER_SAVE`, `BEFORE_CREATE`, `AFTER_CREATE`, `BEFORE_UPDATE`, `AFTER_UPDATE`, `BEFORE_DELETE`, `AFTER_DELETE`.
-- **Smart Conditions:** Filter execution using `when`, `was`, `is_now`, and `has_changed`.
+- **Smart Conditions:** Filter execution using `when`, `was`, `is_now`, `has_changed`.
+- **Advanced Logic:** Combine conditions with `&`, `|`, `~` (e.g. `WhenFieldHasChanged("x") & WhenFieldValueIs("y", 1)`).
+- **Stacked Hooks:** Decorate a single method with multiple hooks.
+- **Related Field Watching:** Watch changes on related models using dot notation (`author.name`).
 - **Transaction Safety:** Native `on_commit=True` support ensures your side effects (emails, tasks) only fire if the database transaction persists.
 - **Developer Experience:** Auto-completion friendly and fully documented types.
