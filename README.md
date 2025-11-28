@@ -1,10 +1,9 @@
 # Django Lifecycle Hooks
 
-[![PyPI version](https://badge.fury.io/py/django-lifecycle-hooks.svg)](https://badge.fury.io/py/django-lifecycle-hooks)
-[![Python Versions](https://img.shields.io/pypi/pyversions/django-lifecycle-hooks.svg)](https://pypi.org/project/django-lifecycle-hooks/)
-[![Django Versions](https://img.shields.io/pypi/djversions/django-lifecycle-hooks.svg)](https://pypi.org/project/django-lifecycle-hooks/)
+[![PyPI version](https://img.shields.io/pypi/v/django-lifecycle-hooks.svg?color=blue)](https://pypi.org/project/django-lifecycle-hooks/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/django-lifecycle-hooks.svg?color=blue)](https://pypi.org/project/django-lifecycle-hooks/)
+[![Django Versions](https://img.shields.io/pypi/djversions/django-lifecycle-hooks.svg?color=blue)](https://pypi.org/project/django-lifecycle-hooks/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 **The next-generation, high-performance declarative lifecycle hooks library for Django.**
 
 Engineered for **Enterprise** projects requiring surgical precision, zero runtime overhead, and full compatibility with the modern Python stack (3.10 through 3.14+) and Django 4.x+.
