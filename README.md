@@ -77,8 +77,7 @@ class UserAccount(LifecycleModelMixin, models.Model):
 
 ## 📚 Documentation
 
-- [**User Guide**](docs/user-guide.md): Master advanced patterns (Async, Stacked Hooks, Conditions).
-- [**API Reference**](docs/api.md): Detailed technical specs.
+- [**Documentation**](https://jotauses.github.io/django-lifecycle-hooks/): Master advanced patterns (Async, Stacked Hooks, Conditions).
 
 ---
 *Built for engineers who care about speed, clean code, and type safety ♥️*

@@ -1,10 +1,14 @@
 # API Reference
 
+This section provides detailed technical documentation for the `django-lifecycle-hooks` API.
+
+---
+
 ## 🧩 Decorators
 
 ### `@hook`
 
-The core decorator for registering lifecycle methods.
+The core decorator used to register lifecycle methods.
 
 ```python
 def hook(
@@ -21,60 +25,100 @@ def hook(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `trigger` | `HookType` | The lifecycle event to hook into (e.g., `HookType.BEFORE_SAVE`). |
-| `when` | `str` | Optional field name to watch. Supports dot notation for related fields (e.g., `"author.name"`). |
-| `was` | `Any` | Execute only if the field's **previous** value matches this. Defaults to `"*"` (any). |
-| `is_now` | `Any` | Execute only if the field's **current** value matches this. Defaults to `"*"` (any). |
-| `has_changed` | `bool` | If `True`, execute only if the field's value has changed. |
-| `condition` | `Condition` | An advanced condition object (e.g., `WhenFieldHasChanged(...)`). |
-| `priority` | `int` | Execution order. Higher values run first. Default is `0`. |
-| `on_commit` | `bool` | If `True`, the hook runs only after the transaction commits successfully. |
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `trigger` | `HookType` | **Required** | The lifecycle event to hook into (e.g., `HookType.BEFORE_SAVE`). |
+| `when` | `str` | `None` | The field name to watch. Supports dot notation (e.g., `"author.name"`). |
+| `was` | `Any` | `"*"` | Execute only if the field's **previous** value matches this. `"*"` means any value. |
+| `is_now` | `Any` | `"*"` | Execute only if the field's **current** value matches this. `"*"` means any value. |
+| `has_changed` | `bool` | `False` | If `True`, execute only if the field's value has changed. |
+| `condition` | `Condition` | `None` | An advanced condition object (e.g., `WhenFieldHasChanged(...)`). |
+| `priority` | `int` | `0` | Execution order. Higher values run first. |
+| `on_commit` | `bool` | `False` | If `True`, the hook runs only after the transaction commits successfully. |
 
 ---
 
-## 🧬 Mixins
+## 🏗️ Mixins
 
 ### `LifecycleModelMixin`
 
-The mixin that powers the lifecycle hooks. Inherit from this in your Django models.
+The base mixin that enables lifecycle hooks on your Django models.
 
-**Methods:**
+#### Methods
 
-#### `has_changed(field_name: str) -> bool`
-Checks if a specific field has changed since the model was instantiated or last saved.
+##### `has_changed(field_name: str) -> bool`
+Checks if a field has changed since the instance was loaded or last saved.
+- **Note**: Only works for fields that are being watched by at least one hook (Sparse Snapshotting).
 
-#### `initial_value(field_name: str) -> Any`
-Returns the value of the field as it was when the instance was loaded from the database.
+##### `initial_value(field_name: str) -> Any`
+Returns the value of the field as it was when the instance was loaded.
 
-#### `current_value(field_name: str) -> Any`
+##### `current_value(field_name: str) -> Any`
 Returns the current value of the field on the instance.
 
-#### `suppress_hooked_methods() -> ContextManager`
+##### `suppress_hooked_methods()`
 A context manager to temporarily disable all lifecycle hooks for the instance.
 
 ```python
 with instance.suppress_hooked_methods():
-    instance.save()  # No hooks will run
+    instance.save()
 ```
 
 ---
 
-## 🎛️ Conditions
+## 🚦 Enums
 
-Advanced condition classes for complex logic. These can be combined using `&` (AND), `|` (OR), and `~` (NOT).
+### `HookType`
 
-| Class | Description |
-| :--- | :--- |
-| `WhenFieldHasChanged(field)` | True if the field has changed. |
-| `WhenFieldValueIs(field, value)` | True if current value equals `value`. |
-| `WhenFieldValueIsNot(field, value)` | True if current value does **not** equal `value`. |
-| `WhenFieldValueWas(field, value)` | True if initial value equaled `value`. |
-| `WhenFieldValueWasNot(field, value)` | True if initial value did **not** equal `value`. |
-| `WhenFieldValueChangesTo(field, value)` | True if field changed **and** new value equals `value`. |
+Defines the available lifecycle events.
 
-**Example:**
+- `BEFORE_SAVE`
+- `AFTER_SAVE`
+- `BEFORE_CREATE`
+- `AFTER_CREATE`
+- `BEFORE_UPDATE`
+- `AFTER_UPDATE`
+- `BEFORE_DELETE`
+- `AFTER_DELETE`
+
+---
+
+## 🧠 Conditions
+
+Condition classes allow for complex logic. They support logical operators: `&` (AND), `|` (OR), `~` (NOT).
+
+### `WhenFieldHasChanged`
+Checks if a field's value has changed.
 ```python
-condition = WhenFieldHasChanged("status") & ~WhenFieldValueIs("type", "draft")
+WhenFieldHasChanged(field_name: str)
+```
+
+### `WhenFieldValueIs`
+Checks if a field's **current** value equals the given value.
+```python
+WhenFieldValueIs(field_name: str, value: Any)
+```
+
+### `WhenFieldValueIsNot`
+Checks if a field's **current** value does **not** equal the given value.
+```python
+WhenFieldValueIsNot(field_name: str, value: Any)
+```
+
+### `WhenFieldValueWas`
+Checks if a field's **initial** value equals the given value.
+```python
+WhenFieldValueWas(field_name: str, value: Any)
+```
+
+### `WhenFieldValueWasNot`
+Checks if a field's **initial** value does **not** equal the given value.
+```python
+WhenFieldValueWasNot(field_name: str, value: Any)
+```
+
+### `WhenFieldValueChangesTo`
+Checks if a field has changed **AND** its new value equals the given value.
+```python
+WhenFieldValueChangesTo(field_name: str, value: Any)
 ```
