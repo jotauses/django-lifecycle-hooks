@@ -7,7 +7,7 @@
 
 **The next-generation, high-performance declarative lifecycle hooks library for Django.**
 
-Engineered for **Enterprise** projects requiring surgical precision, zero runtime overhead, and full compatibility with the modern Python stack (3.10 through 3.14+) and Django 5.x.
+Engineered for **Enterprise** projects requiring surgical precision, zero runtime overhead, and full compatibility with the modern Python stack (3.10 through 3.14+) and Django 4.x+.
 
 ---
 
