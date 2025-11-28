@@ -18,6 +18,7 @@ Most lifecycle libraries (and Django's own signals) rely on heavy runtime intros
 **Django Lifecycle Hooks** is engineered for **performance-critical** applications:
 
 - **🚀 Zero Runtime Overhead**: Hook resolution happens **once** at import time. Executing hooks is an **O(1)** operation.
+- **⚡ First-Class Async & ASGI Support**: The **only** lifecycle library with native `asave` and `acreate` support. We don't just wrap sync code; we await your async hooks properly.
 - **💾 Sparse Snapshotting**: We don't copy your entire model. If you only watch `status`, we only cache `status`. Your memory usage stays flat.
 - **🛡️ Type-Safe & Modern**: Built for **Python 3.14+** and **Django 5.2+**. Fully typed, `__slots__` optimized, and ready for strict MyPy validation.
 - **✨ Developer Joy**: No more hunting for `@receiver` in random files. Logic lives where it belongs: **inside your model** or **specialized hooks**.
@@ -31,7 +32,7 @@ Most lifecycle libraries (and Django's own signals) rely on heavy runtime intros
 | **Hook Resolution** | Runtime Introspection (Slow) | **Import-time Registry (Instant)** |
 | **Change Detection** | Full `__dict__` copy (High RAM) | **Sparse Field Copy (Low RAM)** |
 | **Lookup Speed** | O(n) Listener Loop | **O(1) Direct Dispatch** |
-| **Async Support** | Limited / Hacky | **Native `asave` & `acreate` Support** |
+| **Async / ASGI** | ❌ None or Hacky Wrappers | **✅ Native `asave` & `acreate` Support** |
 
 ---
 
