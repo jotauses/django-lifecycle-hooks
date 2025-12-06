@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-lifecycle-hooks"
-version = "1.0.1"
+version = "1.0.2"
 description = "A next-generation, high-performance declarative lifecycle hooks library for Django 5.x+"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
-  { name = "Your Name", email = "your.email@example.com" },
+  { name = "Joaquín Vázquez", email = "jota.dev.es@gmail.com" },
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -34,8 +34,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/django-lifecycle-next"
-"Bug Tracker" = "https://github.com/yourusername/django-lifecycle-next/issues"
+"Homepage" = "https://github.com/jotauses/django-lifecycle-hooks"
+"Bug Tracker" = "https://github.com/jotauses/django-lifecycle-hooks/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/django_lifecycle_hooks"]
