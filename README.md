@@ -1,50 +1,55 @@
-# Django Lifecycle Hooks
+# 🪝 Django Lifecycle Hooks
 
-**The high-performance, zero-overhead alternative to Django Signals.**
+> **High-performance, declarative lifecycle hooks for your Django models.**
 
-[![PyPI version](https://img.shields.io/pypi/v/django-lifecycle-hooks.svg?color=2c3e50&labelColor=ecf0f1)](https://pypi.org/project/django-lifecycle-hooks/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/django-lifecycle-hooks.svg?color=2c3e50&labelColor=ecf0f1)](https://pypi.org/project/django-lifecycle-hooks/)
-[![Django Versions](https://img.shields.io/pypi/djversions/django-lifecycle-hooks.svg?color=2c3e50&labelColor=ecf0f1)](https://pypi.org/project/django-lifecycle-hooks/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-2c3e50.svg?labelColor=ecf0f1)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/docs-live-brightgreen)](https://jotauses.github.io/django-lifecycle-hooks/)
+[![Tests](https://img.shields.io/badge/tests-passing-success)](https://github.com/jotauses/django-lifecycle-hooks)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-success)](https://github.com/jotauses/django-lifecycle-hooks)
+[![Python](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-blue)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-4.2%20|%205.0%20|%205.1%20|%205.2-green)](https://www.djangoproject.com/)
 
----
+**Full Documentation**: [https://jotauses.github.io/django-lifecycle-hooks/](https://jotauses.github.io/django-lifecycle-hooks/)
 
-## ⚡ Why this library?
+## 📋 Requirements
 
-**Stop slowing down your Django app with inefficient signals.**
-
-Most lifecycle libraries (and Django's own signals) rely on heavy runtime introspection, full object copying, and loose coupling that makes debugging a nightmare.
-
-**Django Lifecycle Hooks** is engineered for **performance-critical** applications:
-
-- **🚀 Zero Runtime Overhead**: Hook resolution happens **once** at import time. Executing hooks is an **O(1)** operation.
-- **⚡ First-Class Async & ASGI Support**: The **only** lifecycle library with native `asave` and `acreate` support. We don't just wrap sync code; we await your async hooks properly.
-- **💾 Sparse Snapshotting**: We don't copy your entire model. If you only watch `status`, we only cache `status`. Your memory usage stays flat.
-- **🛡️ Type-Safe & Modern**: Built for **Python 3.14+** and **Django 5.2+**. Fully typed, `__slots__` optimized, and ready for strict MyPy validation.
-- **✨ Developer Joy**: No more hunting for `@receiver` in random files. Logic lives where it belongs: **inside your model** or **specialized hooks**.
+*   **Python**: 3.10, 3.11, 3.12, 3.13, 3.14
+*   **Django**: 4.2 (LTS), 5.0, 5.1, 5.2
 
 ---
 
-## 🏎️ Performance Comparison
+## 🌟 Why Django Lifecycle Hooks?
 
-| Feature | Standard Signals / Legacy Libs | Django Lifecycle Hooks |
-| :--- | :--- | :--- |
-| **Hook Resolution** | Runtime Introspection (Slow) | **Import-time Registry (Instant)** |
-| **Change Detection** | Full `__dict__` copy (High RAM) | **Sparse Field Copy (Low RAM)** |
-| **Lookup Speed** | O(n) Listener Loop | **O(1) Direct Dispatch** |
-| **Async / ASGI** | ❌ None or Hacky Wrappers | **✅ Native `asave` & `acreate` Support** |
+Stop slowing down your Django app with inefficient signals. You need a solution that is:
 
----
+*   **Zero Runtime Overhead:** Hook resolution happens **once** at import time. O(1) dispatch.
+*   **Ultra Efficient:** Sparse snapshotting—we only cache what you watch.
+*   **Async Native:** The **only** library with first-class `asave` and `acreate` support.
+*   **Developer Friendly:** Type-safe, declarative API that lives inside your model.
 
 ## 🚀 Quick Start
 
-### 1. Install
+### 1. Installation
+
 ```bash
 pip install django-lifecycle-hooks
 ```
 
-### 2. Write Elegant Code
-Inherit from `LifecycleModelMixin` and declare your logic.
+### 2. Add to your App
+
+Add `django_lifecycle_hooks` to your `INSTALLED_APPS`:
+
+```python
+# settings.py
+INSTALLED_APPS = [
+    ...
+    'django_lifecycle_hooks',
+    ...
+]
+```
+
+### 3. Enable Hooks
+
+Inherit from `LifecycleModelMixin` in your model. That's it!
 
 ```python
 from django.db import models
@@ -53,31 +58,90 @@ from django_lifecycle_hooks import LifecycleModelMixin, hook, HookType
 class UserAccount(LifecycleModelMixin, models.Model):
     username = models.CharField(max_length=100)
     status = models.CharField(max_length=20, default="active")
-    
-    # ✅ 1. Simple & Fast
+
     @hook(HookType.BEFORE_SAVE)
     def clean_username(self):
         self.username = self.username.lower()
-
-    # ✅ 2. Conditional & Declarative
-    # Only runs when status changes to 'banned'. 
-    # No "if" checks needed inside your method.
-    @hook(HookType.AFTER_UPDATE, when="status", was="active", is_now="banned")
-    def on_ban(self):
-        self.ban_related_assets()
-
-    # ✅ 3. Transaction Safe
-    # Only fires after the DB transaction commits successfully.
-    @hook(HookType.AFTER_SAVE, on_commit=True)
-    def send_welcome_email(self):
-        send_email_task.delay(self.id)
 ```
 
 ---
 
-## 📚 Documentation
+## 📖 Usage Guide
 
-- [**Documentation**](https://jotauses.github.io/django-lifecycle-hooks/): Master advanced patterns (Async, Stacked Hooks, Conditions).
+### Simple Hooks
+
+Replace messy signals with clean, decorated methods.
+
+```python
+@hook(HookType.AFTER_CREATE)
+def on_create(self):
+    print(f"User {self.username} created!")
+```
+
+### 🔀 Conditional Execution
+
+Only run logic when specific fields change. No more `if` spaghetti.
+
+```python
+# Only runs when status changes from 'active' to 'banned'
+@hook(HookType.AFTER_UPDATE, when="status", was="active", is_now="banned")
+def on_ban(self):
+    self.ban_related_assets()
+```
+
+### ⚡ Async & ASGI Support
+
+We don't just wrap sync code; we await your async hooks properly.
+
+```python
+@hook(HookType.AFTER_SAVE)
+async def send_welcome_email(self):
+    await email_service.send_async(self.email)
+```
+
+### 🛡️ Transaction Safety
+
+Ensure your hooks only fire after the database transaction commits.
+
+```python
+@hook(HookType.AFTER_SAVE, on_commit=True)
+def trigger_background_job(self):
+    # This task is only queued if the transaction succeeds
+    process_data.delay(self.id)
+```
+
+### 🏎️ Performance Comparison
+
+| Feature | Standard Signals | Django Lifecycle Hooks |
+| :--- | :--- | :--- |
+| **Hook Resolution** | Runtime Introspection (Slow) | **Import-time Registry (Instant)** |
+| **Change Detection** | Full `__dict__` copy (High RAM) | **Sparse Field Copy (Low RAM)** |
+| **Lookup Speed** | O(n) Listener Loop | **O(1) Direct Dispatch** |
+| **Async / ASGI** | ❌ None or Hacky Wrappers | **✅ Native `asave` & `acreate` Support** |
+
+---
+
+## 🧪 Running Tests
+
+We use `pytest` for a robust testing suite.
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=django_lifecycle_hooks
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ---
 

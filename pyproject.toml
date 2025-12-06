@@ -35,6 +35,7 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/jotauses/django-lifecycle-hooks"
+"Documentation" = "https://jotauses.github.io/django-lifecycle-hooks/"
 "Bug Tracker" = "https://github.com/jotauses/django-lifecycle-hooks/issues"
 
 [tool.hatch.build.targets.wheel]
